@@ -3,13 +3,24 @@
 const express = require('express');
 const {body} = require('express-validator');
 var api = express.Router();
+var middleware = require('../middleware/middleware');
 
 var UsersController = require('../controllers/user');
+var AuthController = require('../controllers/auth');
+
+//Loggin
+api.post('/loggin', [
+  body("email").not().isEmpty(),
+  body("password").not().isEmpty(),
+],AuthController.loggin_user);
+
 
 //Usuarios
 //Read
-api.get('/user', UsersController.userlist);
-api.get('/user/:idUser', UsersController.userById);
+api.get('/user', middleware.userprotectUrl, UsersController.userlist);
+api.get('/user/:idUser', [
+  body("idUser").not().isEmpty(),
+], middleware.userprotectUrl, UsersController.userById);
 //Create
 api.post('/user', [
   body("idUser").not().isEmpty(),
@@ -17,19 +28,18 @@ api.post('/user', [
   body("apellido").not().isEmpty(),
   body("edad").not().isEmpty(),
   body("email").not().isEmpty()
-]
-,UsersController.createuser);
+],middleware.userprotectUrl, UsersController.createuser);
 //Update
 api.put('/user/:idUser',[
   body("idUser").not().isEmpty(),
   body("name").not().isEmpty(),
   body("apellido").not().isEmpty(),
   body("edad").not().isEmpty()
-], UsersController.updateuser);
+],middleware.userprotectUrl, UsersController.updateuser);
 //Delete
 api.delete('/user/:idUser', [
   body("idUser").not().isEmpty(),
-],UsersController.deleteuser);
+],middleware.userprotectUrl, UsersController.deleteuser);
 
 //Read
 //Version inicia de la llamada de la api

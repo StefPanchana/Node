@@ -5,7 +5,7 @@ var app = require('./app');
 var port = 3000;
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb+srv://gatitobebe90:Gatiko$12@cluster0.i4jz0mg.mongodb.net/curso', { useNewUrlParser: true, useUnifiedTopology: true})
+mongoose.connect(process.env.MONGODB, { useNewUrlParser: true, useUnifiedTopology: true})
 .then(
     () =>{
         console.log("Conexión exitosa!");

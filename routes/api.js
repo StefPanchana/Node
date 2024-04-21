@@ -14,6 +14,8 @@ api.post('/loggin', [
   body("password").not().isEmpty(),
 ],AuthController.loggin_user);
 
+//Logout
+api.post('/logout', middleware.userprotectUrl, AuthController.logout_user);
 
 //Usuarios
 //Read

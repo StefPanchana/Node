@@ -85,8 +85,37 @@ var controller = {
                 message: "Datos no validos."
             });
         });
-    }
+    },
 
+    logout_user: function(req, res){
+        const token = req.headers['x-nodeproject-access-token'];
+
+        Sessions.findOneAndDelete({
+            user: req.decode.user.email,
+            key: token
+        })
+        .then(session =>{
+            if (!session){
+                return res.status(401).send({
+                    status: 401,
+                    message: "Token invalido."
+                });
+            }
+
+            return res.status(200).send({
+                status: 200,
+                message: "Logout completo satisfactoriamente."
+            });
+        })
+        .catch(error => {
+            console.error(error);
+            return res.status(500).send({
+                status: 500,
+                message: "Token invalido"
+            });
+        });
+
+    }
 }
 
 module.exports = controller;

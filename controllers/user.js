@@ -2,6 +2,7 @@
 
 var Users = require('../models/users');
 const {validationResult} = require('express-validator')
+const bcrypt = require('bcrypt');
 
 var controller = {
 
@@ -75,33 +76,42 @@ var controller = {
                 });
             }
             
-            //Continuar proceso de creacion de usuario
-            var create_user = new Users();
-            create_user.idUser = data.idUser;
-            create_user.name = data.name;
-            create_user.edad = data.edad;
-            create_user.apellido = data.apellido;
-            create_user.grupos = data.grupos;
-            create_user.materias = data.materias;
-            create_user.email = data.email;
+            //Generar encriptacion de password
+            const saltRounds = 10;
 
-            create_user.save()
-            .then(result =>{
-                console.log(result);
-                return res.status(200).send({
-                    status: 200,
-                    message: "Usuario Creado con Exito.",
-                    data: result
-                });
-            })
-            .catch(error => {
-                console.error(error);
-                return res.status(500).send({
-                    status: 500,
-                    message: "No se grabo el usuario."
-                });
+            bcrypt.genSalt(saltRounds, function(err, salt){
+                bcrypt.hash(data.password, salt, function(err, hash){
+                    //Store hash in your field password for BD
+                    
+                    //Continuar proceso de creacion de usuario
+                    var create_user = new Users();
+                    create_user.idUser = data.idUser;
+                    create_user.name = data.name;
+                    create_user.edad = data.edad;
+                    create_user.apellido = data.apellido;
+                    create_user.grupos = data.grupos;
+                    create_user.materias = data.materias;
+                    create_user.email = data.email;
+                    create_user.password = hash;
+
+                    create_user.save()
+                    .then(result =>{
+                        console.log(result);
+                        return res.status(200).send({
+                            status: 200,
+                            message: "Usuario Creado con Exito.",
+                            data: result
+                        });
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        return res.status(500).send({
+                            status: 500,
+                            message: "No se grabo el usuario."
+                        });
+                    });
+                })
             });
-            
         })
         .catch(error => {
             console.error(error);
@@ -127,32 +137,42 @@ var controller = {
 
         var data = req.body;
 
-        var update_user = {
-            idUser: data.idUser,
-            name: data.name,
-            apellido: data.apellido,
-            edad: data.edad,
-            grupos: data.grupos,
-            materias: data.materias,
-            email: data.email
-        }
 
-        Users.findOneAndUpdate({
-            idUser: parseInt(req.params.idUser)
-        },
-        update_user)
-        .then(usuario =>{
-            return res.status(200).send({
-                status: 200,
-                message: usuario==null? "No se encontro registro de usuario.": "Usuario Actualizado."
-            });
-        })
-        .catch(error => {
-            console.error(error);
-            return res.status(500).send({
-                status: 500,
-                message: "No se pudo actualizar el usuario"
-            });
+        //Generar encriptacion de password
+        const saltRounds = 10;
+
+        bcrypt.genSalt(saltRounds, function(err, salt){
+            bcrypt.hash(data.password, salt, function(err, hash){
+                
+                var update_user = {
+                    idUser: data.idUser,
+                    name: data.name,
+                    apellido: data.apellido,
+                    edad: data.edad,
+                    grupos: data.grupos,
+                    materias: data.materias,
+                    email: data.email,
+                    password: hash
+                }
+
+                Users.findOneAndUpdate({
+                    idUser: parseInt(req.params.idUser)
+                },
+                update_user)
+                .then(usuario =>{
+                    return res.status(200).send({
+                        status: 200,
+                        message: usuario==null? "No se encontro registro de usuario.": "Usuario Actualizado."
+                    });
+                })
+                .catch(error => {
+                    console.error(error);
+                    return res.status(500).send({
+                        status: 500,
+                        message: "No se pudo actualizar el usuario"
+                    });
+                });
+            })
         });
     },
 

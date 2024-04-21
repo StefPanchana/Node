@@ -29,14 +29,17 @@ api.post('/user', [
   body("name").not().isEmpty(),
   body("apellido").not().isEmpty(),
   body("edad").not().isEmpty(),
-  body("email").not().isEmpty()
+  body("email").not().isEmpty(),
+  body("password").not().isEmpty()
 ],middleware.userprotectUrl, UsersController.createuser);
 //Update
 api.put('/user/:idUser',[
   body("idUser").not().isEmpty(),
   body("name").not().isEmpty(),
   body("apellido").not().isEmpty(),
-  body("edad").not().isEmpty()
+  body("edad").not().isEmpty(),
+  body("email").not().isEmpty(),
+  body("password").not().isEmpty()
 ],middleware.userprotectUrl, UsersController.updateuser);
 //Delete
 api.delete('/user/:idUser', [
